@@ -9,5 +9,5 @@ def settings_instance():
 def bugzilla_instance():
     settings = Settings()
     bugzilla = Bugzilla(settings.url())
-    bugzilla.set_auth_token(settings.auth_token())
+    bugzilla.set_api_key(settings.api_key())
     return bugzilla

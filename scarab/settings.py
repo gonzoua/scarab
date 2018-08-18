@@ -21,5 +21,5 @@ class Settings(object):
     def url(self):
         return self.__config['global']['bugzilla']
 
-    def auth_token(self):
-        return self.__config['global']['auth_token']
+    def api_key(self):
+        return self.__config['global']['api_key']

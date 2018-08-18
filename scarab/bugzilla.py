@@ -30,16 +30,16 @@ class Attachment(object):
         return ("Attachment(%d, '%s')" % (self.object_id, self.file_name))
 
 class Bugzilla(object):
-    __token = None
+    __api_key = None
 
     def __init__(self, url):
         self.__proxy = xmlrpc.client.ServerProxy(url)
 
-    def set_auth_token(self, token):
-        self.__token = token
+    def set_api_key(self, api_key):
+        self.__api_key = api_key
 
     def common_args(self):
-        return {'Bugzilla_token': self.__token}
+        return {'Bugzilla_api_key': self.__api_key}
 
     def products(self):
         args = self.common_args()
@@ -75,9 +75,13 @@ class Bugzilla(object):
         reply = self.__proxy.Bug.attachments(args)
         return Attachment(reply['attachments'][str(attachment_id)])
 
-    def download(self, attachment_id, file_name):
+    def add_attachment(self, bug_id, file_name, data, summary=None, content_type='application/octect-stream'):
         args = self.common_args()
-        args['attachment_ids'] = [attachment_id]
-        # Do not requets attachment data
-        reply = self.__proxy.Bug.attachments(args)
-        d = reply['attachments'][str(attachment_id)]
+        args['ids'] = [bug_id]
+        args['file_name'] = file_name
+        args['data'] = data
+        args['summary'] = summary if summary is not None else file_name
+        args['content_type'] = content_type
+        print (args)
+        reply = self.__proxy.Bug.add_attachment(args)
+        print (reply)
