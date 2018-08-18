@@ -1,4 +1,7 @@
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+
 from commands import create_parser
+from settings import Settings
 
 def main():
     parser = create_parser()
