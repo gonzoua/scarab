@@ -75,13 +75,14 @@ class Bugzilla(object):
         reply = self.__proxy.Bug.attachments(args)
         return Attachment(reply['attachments'][str(attachment_id)])
 
-    def add_attachment(self, bug_id, file_name, data, summary=None, content_type='application/octect-stream'):
+    def add_attachment(self, bug_id, file_name, data, summary=None, comment=None, content_type='application/octect-stream'):
         args = self.common_args()
         args['ids'] = [bug_id]
         args['file_name'] = file_name
         args['data'] = data
         args['summary'] = summary if summary is not None else file_name
         args['content_type'] = content_type
-        print (args)
+        if comment is not None:
+            args['comment'] = comment
         reply = self.__proxy.Bug.add_attachment(args)
         print (reply)
