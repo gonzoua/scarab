@@ -1,8 +1,7 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 import xmlrpc.client
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 class Attachment(object):
     def __init__(self, d):
@@ -22,6 +21,10 @@ class Attachment(object):
         self.last_change_time = dt
         self.creator = d['creator']
         self.is_obsolete = d['is_obsolete']
+        if 'data' in d:
+            self.data = d['data'].data
+        else:
+            self.data = b''
 
     def __repr__(self):
         return ("Attachment(%d, '%s')" % (self.object_id, self.file_name))
@@ -64,10 +67,17 @@ class Bugzilla(object):
 
         return result
 
-    def attachment(self, attachment_id):
+    def attachment(self, attachment_id, data=False):
+        args = self.common_args()
+        args['attachment_ids'] = [attachment_id]
+        if not data:
+            args['exclude_fields'] = ['data']
+        reply = self.__proxy.Bug.attachments(args)
+        return Attachment(reply['attachments'][str(attachment_id)])
+
+    def download(self, attachment_id, file_name):
         args = self.common_args()
         args['attachment_ids'] = [attachment_id]
         # Do not requets attachment data
-        args['exclude_fields'] = ['data']
-        result = self.__proxy.Bug.attachments(args)
-        return result
+        reply = self.__proxy.Bug.attachments(args)
+        d = reply['attachments'][str(attachment_id)]
