@@ -1,7 +1,10 @@
 import argparse
+import traceback
 
 from importlib import import_module
 from pkgutil import walk_packages
+
+import ui
 
 def create_parser():
     parser = argparse.ArgumentParser()
@@ -10,7 +13,8 @@ def create_parser():
         try:
             module = import_module(entry[1])
         except Exception as e:
-            print ('Invalid module', entry[1], e)
+            ui.log("Error importing module '{}': {}".format(entry[1], e))
+            ui.log(traceback.format_exc())
             continue
 
         if hasattr(module, 'Command'):

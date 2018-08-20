@@ -85,4 +85,3 @@ class Bugzilla(object):
         if comment is not None:
             args['comment'] = comment
         reply = self.__proxy.Bug.add_attachment(args)
-        print (reply)

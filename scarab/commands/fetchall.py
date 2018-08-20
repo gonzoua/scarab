@@ -5,6 +5,7 @@ import os
 from context import bugzilla_instance
 
 from .base import Base
+import ui
 
 class Command(Base):
     """Download all non-obsolete attachement for specified bug ID"""
@@ -26,7 +27,7 @@ class Command(Base):
                 file_name = orig_file_name + '.' + str(i)
                 i += 1
 
-            print ("Downloading attachment #{} to {}".format(attachment.object_id, file_name))
+            ui.log("Downloading attachment #{} to {}".format(attachment.object_id, file_name))
             attachment = bugzilla.attachment(attachment.object_id, data=True)
             out = open(file_name, 'wb+')
             out.write(attachment.data)

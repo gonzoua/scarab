@@ -51,6 +51,4 @@ class Command(Base):
             row_format = '  '.join(column_formats)
             row_format += ' {}'
             for row in rows:
-                print (row_format.format(*row))
-
-        # print("{: >7} {: >20}".format(a.object_id, a.file_name))
+                ui.output(row_format.format(*row))

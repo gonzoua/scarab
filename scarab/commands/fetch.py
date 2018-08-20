@@ -5,6 +5,7 @@ import os
 from context import bugzilla_instance
 
 from .base import Base
+import ui
 
 class Command(Base):
     """Download attachment specified by ID"""
@@ -31,7 +32,7 @@ class Command(Base):
                 i += 1
 
         desc_name = 'standard out' if file_name == '-' else file_name
-        print ("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
+        ui.log("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
         attachment = bugzilla.attachment(args.attachment_id, data=True)
         if file_name == '-':
             out = sys.stdout.buffer
