@@ -3,6 +3,23 @@
 import xmlrpc.client
 from datetime import datetime, timezone
 
+
+class BugzillaError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+def xmlrpc_method(method):
+    def wrapper(*args, **kwargs):
+        try:
+            return method(*args, **kwargs)
+        except xmlrpc.client.ProtocolError as e:
+            raise BugzillaError('{}: {} {}'.format(e.url, e.errcode, e.errmsg))
+        except xmlrpc.client.Fault as e:
+            raise BugzillaError('{} ({})'.format(e.faultString, e.faultCode))
+
+    return wrapper
+
 class Attachment(object):
     def __init__(self, d):
         self.object_id = int(d['id'])
@@ -41,17 +58,20 @@ class Bugzilla(object):
     def common_args(self):
         return {'Bugzilla_api_key': self.__api_key}
 
+    @xmlrpc_method
     def products(self):
         args = self.common_args()
         result = self.__proxy.Product.get_selectable_products(args)
         return result
 
+    @xmlrpc_method
     def bug(self, bug_id):
         args = self.common_args()
         args['ids'] = [bug_id]
         result = self.__proxy.Bug.get(args)
         return result
 
+    @xmlrpc_method
     def attachments(self, bug_id, include_obsolete=False):
         args = self.common_args()
         args['ids'] = [bug_id]
@@ -67,14 +87,18 @@ class Bugzilla(object):
 
         return result
 
+    @xmlrpc_method
     def attachment(self, attachment_id, data=False):
         args = self.common_args()
         args['attachment_ids'] = [attachment_id]
         if not data:
             args['exclude_fields'] = ['data']
         reply = self.__proxy.Bug.attachments(args)
+        if not str(attachment_id) in reply['attachments']:
+            return None
         return Attachment(reply['attachments'][str(attachment_id)])
 
+    @xmlrpc_method
     def add_attachment(self, bug_id, file_name, data, summary=None, comment=None, content_type='application/octect-stream'):
         args = self.common_args()
         args['ids'] = [bug_id]
@@ -85,3 +109,7 @@ class Bugzilla(object):
         if comment is not None:
             args['comment'] = comment
         reply = self.__proxy.Bug.add_attachment(args)
+        ids = reply.get('ids', [])
+        if len(ids) > 0:
+            return ids[0]
+        return None

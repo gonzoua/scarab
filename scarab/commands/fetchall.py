@@ -3,6 +3,7 @@
 import sys
 import os
 from context import bugzilla_instance
+from bugzilla import BugzillaError
 
 from .base import Base
 import ui
@@ -17,7 +18,11 @@ class Command(Base):
 
     def run(self, args):
         bugzilla = bugzilla_instance()
-        attachments = bugzilla.attachments(args.bug_id)
+        try:
+            attachments = bugzilla.attachments(args.bug_id)
+        except BugzillaError as e:
+            ui.fatal('Bugzilla error: {}'.format(e.message))
+
         for attachment in attachments:
             file_name = os.path.basename(attachment.file_name)
             orig_file_name = file_name
@@ -28,6 +33,13 @@ class Command(Base):
                 i += 1
 
             ui.log("Downloading attachment #{} to {}".format(attachment.object_id, file_name))
-            attachment = bugzilla.attachment(attachment.object_id, data=True)
-            out = open(file_name, 'wb+')
-            out.write(attachment.data)
+            try:
+                attachment = bugzilla.attachment(attachment.object_id, data=True)
+            except BugzillaError as e:
+                ui.fatal('Bugzilla error: {}'.format(e.message))
+
+            try:
+                out = open(file_name, 'wb+')
+                out.write(attachment.data)
+            except Exception as e:
+                ui.fatal('error saving file: {}'.format(str(e)))

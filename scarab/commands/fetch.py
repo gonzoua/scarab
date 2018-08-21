@@ -3,6 +3,7 @@
 import sys
 import os
 from context import bugzilla_instance
+from bugzilla import BugzillaError
 
 from .base import Base
 import ui
@@ -18,7 +19,14 @@ class Command(Base):
 
     def run(self, args):
         bugzilla = bugzilla_instance()
-        attachment = bugzilla.attachment(args.attachment_id)
+        try:
+            attachment = bugzilla.attachment(args.attachment_id)
+        except BugzillaError as e:
+            ui.fatal('Bugzilla error: {}'.format(e.message))
+
+        if attachment is None:
+            ui.fatal('attachment {} not found'.format(args.attachment_id))
+
         # Not None and not empty
         if args.output:
             file_name = args.output
@@ -33,9 +41,16 @@ class Command(Base):
 
         desc_name = 'standard out' if file_name == '-' else file_name
         ui.log("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
-        attachment = bugzilla.attachment(args.attachment_id, data=True)
-        if file_name == '-':
-            out = sys.stdout.buffer
-        else:
-            out = open(file_name, 'wb+')
-        out.write(attachment.data)
+        try:
+            attachment = bugzilla.attachment(args.attachment_id, data=True)
+        except BugzillaError as e:
+            ui.fatal('Bugzilla error: {}'.format(e.message))
+
+        try:
+            if file_name == '-':
+                out = sys.stdout.buffer
+            else:
+                out = open(file_name, 'wb+')
+            out.write(attachment.data)
+        except Exception as e:
+            ui.fatal('error saving file: {}'.format(str(e)))

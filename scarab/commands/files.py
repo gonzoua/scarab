@@ -5,6 +5,9 @@ from context import bugzilla_instance
 from json import dumps
 from .base import Base
 from datetime import datetime, timezone
+from bugzilla import BugzillaError
+
+import ui
 
 class Command(Base):
     """List files attached to specified PR"""
@@ -25,7 +28,10 @@ class Command(Base):
 
     def run(self, args):
         bugzilla = bugzilla_instance()
-        attachments = bugzilla.attachments(args.bug_id, args.all)
+        try:
+            attachments = bugzilla.attachments(args.bug_id, args.all)
+        except BugzillaError as e:
+            ui.fatal('Bugzilla error: {}'.format(e.message))
 
         rows = []
         for a in attachments:
@@ -51,4 +57,4 @@ class Command(Base):
             row_format = '  '.join(column_formats)
             row_format += ' {}'
             for row in rows:
-                ui.output(row_format.format(*row))
+                ui.log(row_format.format(*row))

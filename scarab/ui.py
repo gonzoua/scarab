@@ -2,7 +2,7 @@
 import sys
 
 def fatal(line):
-    sys.stderr.write('FATAL: {}\n'.format(line))
+    sys.stderr.write('{}\n'.format(line))
     sys.exit(1)
 
 def log(line):
