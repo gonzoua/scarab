@@ -56,6 +56,44 @@ class Attachment(object):
     def __repr__(self):
         return "Attachment(%d, '%s')" % (self.object_id, self.file_name)
 
+class Product(object):
+    """Bugzilla product representation"""
+
+    class Component(object):
+        """Bugzilla product's component representation"""
+        def __init__(self, d):
+            self.object_id = int(d['id'])
+            self.name = d['name']
+
+        def __repr__(self):
+            return "Component(%d, '%s')" % (self.object_id, self.name)
+
+    class Version(object):
+        """Bugzilla product's version representation"""
+        def __init__(self, d):
+            self.object_id = int(d['id'])
+            self.name = d['name']
+
+        def __repr__(self):
+            return "Component(%d, '%s')" % (self.object_id, self.name)
+
+    def __init__(self, d):
+        # import pprint
+        # pp = pprint.PrettyPrinter()
+        # pp.pprint(d)
+        self.object_id = int(d['id'])
+        self.name = d['name']
+        self.description = d['description']
+        self.components = []
+        self.versions = []
+        for component_d in d['components']:
+            self.components.append(self.Component(component_d))
+        for version_d in d['versions']:
+            self.versions.append(self.Version(version_d))
+
+    def __repr__(self):
+        return "Product(%d, '%s')" % (self.object_id, self.name)
+
 class Bugzilla(object):
     """Wrapper for Bugzilla's XML-RPC API"""
     __api_key = None
@@ -145,3 +183,52 @@ class Bugzilla(object):
         if ids:
             return ids[0]
         return None
+
+    @xmlrpc_method
+    def enterable_products(self):
+        """
+        Returns list of Product objects representing
+        products to which user can submit bugs
+        """
+        args = self.__common_args()
+        ids = self.__proxy.Product.get_enterable_products(args)
+        reply = self.__proxy.Product.get(ids)
+        result = []
+        for obj in reply['products']:
+            product = Product(obj)
+            result.append(product)
+        return result
+
+    @xmlrpc_method
+    def submit(self, product, component, version, summary, \
+            description=None, cc_list=None, platform=None,
+            priority=None, severity=None):
+        """
+        Submit new bug
+        Args:
+            product (string): product name
+            component (string): component name
+            version (string): version value
+            summary (string): one-line summary of the bug
+            description (string, optional): description of the bug
+            cc_list (list, optional): list of users' emails to add to Cc list of the bug
+            priotiry (string, optional): bug priority
+            severity (string, optional): bug severity
+        """
+        args = self.__common_args()
+        args['product'] = product
+        args['component'] = component
+        args['summary'] = summary
+        args['version'] = version
+        if description:
+            args['description'] = description
+        if cc_list:
+            args['cc'] = cc_list
+        if platform:
+            args['platform'] = platform
+        if priority:
+            args['priority'] = priority
+        if severity:
+            args['severity'] = severity
+        reply = self.__proxy.Bug.create(args)
+        return reply['id']
