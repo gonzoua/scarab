@@ -5,6 +5,7 @@ Representation of scarab's run-time settings
 
 import configparser
 import os
+import urllib
 
 class Settings(object):
     """Singleton class that provides access to run-time settings"""
@@ -28,11 +29,15 @@ class Settings(object):
         Returns bugzilla base URL configured in [global]
         section of the config file (parameter 'bugzilla')
         """
-        return self.__config['global']['bugzilla']
+        base = self.__config.get('default', 'url', \
+            fallback='https://bugs.freebsd.org/bugzilla/')
+        if not base.endswith('/'):
+            base += '/'
+        return urllib.parse.urljoin(base, 'xmlrpc.cgi')
 
     def api_key(self):
         """
         Returns API key configured in [global] sectoin of
         the config file (parameter 'api_key')
         """
-        return self.__config['global']['api_key']
+        return self.__config.get('default', 'api_key', fallback=None)
