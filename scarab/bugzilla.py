@@ -69,6 +69,9 @@ class Bugzilla(object):
 
     def __common_args(self):
         """Initialize part of parameters common for all XML-RPC methods"""
+        if self.__api_key is None:
+            return {}
+
         return {'Bugzilla_api_key': self.__api_key}
 
     @xmlrpc_method
