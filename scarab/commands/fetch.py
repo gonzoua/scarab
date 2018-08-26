@@ -1,28 +1,35 @@
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
+
+"""
+Implementation of 'fetch' command
+"""
 
 import sys
 import os
-from context import bugzilla_instance
-from bugzilla import BugzillaError
 
+from ..context import bugzilla_instance
+from ..bugzilla import BugzillaError
+from .. import ui
 from .base import Base
-import ui
 
 class Command(Base):
     """Download attachment specified by ID"""
 
     def register(self, subparsers):
+        """Register args parser for 'fetch' command"""
         parser = subparsers.add_parser('fetch')
         parser.set_defaults(func=self.run)
         parser.add_argument('attachment_id', type=int, help='attachment ID')
-        parser.add_argument('-o', '--output', dest='output', help='output filename, use - for stdout')
+        parser.add_argument('-o', '--output', dest='output', \
+            help='output filename, use - for stdout')
 
     def run(self, args):
+        """Implementation for 'fetch' command"""
         bugzilla = bugzilla_instance()
         try:
             attachment = bugzilla.attachment(args.attachment_id)
-        except BugzillaError as e:
-            ui.fatal('Bugzilla error: {}'.format(e.message))
+        except BugzillaError as exc:
+            ui.fatal('Bugzilla error: {}'.format(exc.message))
 
         if attachment is None:
             ui.fatal('attachment {} not found'.format(args.attachment_id))
@@ -43,8 +50,8 @@ class Command(Base):
         ui.log("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
         try:
             attachment = bugzilla.attachment(args.attachment_id, data=True)
-        except BugzillaError as e:
-            ui.fatal('Bugzilla error: {}'.format(e.message))
+        except BugzillaError as ex:
+            ui.fatal('Bugzilla error: {}'.format(ex.message))
 
         try:
             if file_name == '-':
@@ -52,5 +59,5 @@ class Command(Base):
             else:
                 out = open(file_name, 'wb+')
             out.write(attachment.data)
-        except Exception as e:
-            ui.fatal('error saving file: {}'.format(str(e)))
+        except IOError as ex:
+            ui.fatal('error saving file: {}'.format(str(ex)))
