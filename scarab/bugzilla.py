@@ -78,9 +78,6 @@ class Product(object):
             return "Component(%d, '%s')" % (self.object_id, self.name)
 
     def __init__(self, d):
-        # import pprint
-        # pp = pprint.PrettyPrinter()
-        # pp.pprint(d)
         self.object_id = int(d['id'])
         self.name = d['name']
         self.description = d['description']
@@ -185,13 +182,13 @@ class Bugzilla(object):
         return None
 
     @xmlrpc_method
-    def enterable_products(self):
+    def products(self):
         """
         Returns list of Product objects representing
         products to which user can submit bugs
         """
         args = self.__common_args()
-        ids = self.__proxy.Product.get_enterable_products(args)
+        ids = self.__proxy.Product.get_accessible_products(args)
         reply = self.__proxy.Product.get(ids)
         result = []
         for obj in reply['products']:

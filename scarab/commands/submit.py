@@ -28,25 +28,6 @@ class Command(Base):
         parser.add_argument('-C', '--cc', dest='cc', \
             action='append', help='users to add to CC list (can be specified multiple times)')
 
-
-    def products(self, args):
-        """Implement 'submit' command"""
-
-        bugzilla = bugzilla_instance()
-        try:
-            products = bugzilla.enterable_products()
-        except BugzillaError as exc:
-            ui.fatal('Bugzilla error: {}'.format(exc.message))
-
-        for product in products:
-            print('{}:'.format(product.name))
-            print('  components:')
-            for component in product.components:
-                print('    {}'.format(component.name))
-            print('  versions:')
-            for version in product.versions:
-                print('    {}'.format(version.name))
-
     def run(self, args):
         """Implement 'submit' command"""
 
