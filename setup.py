@@ -52,7 +52,9 @@ setup(
     ],
     keywords = 'bugzilla cli freebsd',
     packages = find_packages(exclude=['docs', 'tests*']),
-    install_requires = [],
+    install_requires = [
+        'python-magic',
+    ],
     extras_require = {
         'test': ['coverage', 'pytest', 'pytest-cov'],
     },
