@@ -4,7 +4,7 @@
 Implementation of 'submit' command
 """
 
-from ..context import bugzilla_instance
+from ..context import bugzilla_instance, settings_instance
 from ..bugzilla import BugzillaError
 from .. import ui
 from .base import Base
@@ -16,12 +16,14 @@ class Command(Base):
         """Register parser for 'submit' command"""
         parser = subparsers.add_parser('submit')
         parser.set_defaults(func=self.run)
+        parser.add_argument('-t', '--template', dest='template', \
+            help='name of the pre-configured bug template')
         parser.add_argument('-p', '--product', dest='product', \
-            required=True, help='name of the product')
+            help='name of the product')
         parser.add_argument('-c', '--component', dest='component', \
-            required=True, help='name of the component')
+            help='name of the component')
         parser.add_argument('-v', '--version', dest='version', \
-            required=True, help='version value')
+            help='version value')
         parser.add_argument('-s', '--summary', dest='summary', \
             required=True, help='summary for the attachment')
         parser.add_argument('-d', '--description', dest='description', help='description text')
@@ -31,9 +33,32 @@ class Command(Base):
     def run(self, args):
         """Implement 'submit' command"""
 
-        product = args.product
-        component = args.component
-        version = args.version
+        template = None
+        if args.template:
+            template = settings_instance().template(args.template)
+
+        if template:
+            product = template.get('product', None)
+            component = template.get('component', None)
+            version = template.get('version', None)
+
+        # Values specified from command line override
+        # values from template
+        if args.product:
+            product = args.product
+        if args.component:
+            component = args.component
+        if args.version:
+            version = args.version
+
+        # product, component and version
+        if product is None:
+            ui.fatal('product value was not specified')
+        if component is None:
+            ui.fatal('component value was not specified')
+        if version is None:
+            ui.fatal('version value was not specified')
+
         summary = args.summary
         description = args.description
         cc_list = args.cc

@@ -10,6 +10,11 @@ import urllib
 class Settings(object):
     """Singleton class that provides access to run-time settings"""
     __instance = None
+    VALID_TEMPLATE_KEYS = [
+        'product',
+        'component',
+        'version',
+    ]
     def __new__(cls):
         if Settings.__instance is None:
             Settings.__instance = object.__new__(cls)
@@ -23,6 +28,19 @@ class Settings(object):
         """Load ini file specified by path"""
         self.__config = configparser.ConfigParser()
         self.__config.read(path)
+        self.__templates = {}
+        # Parse template
+        for section in self.__config:
+            if not section.startswith('template:'):
+                continue
+            template_name = section[9:]
+            template = {}
+            for key in self.__config[section]:
+                if not key in self.VALID_TEMPLATE_KEYS:
+                    raise Exception("Invalid template key '{}' " \
+                        "in section '{}'".format(key, section))
+                template[key] = self.__config[section][key]
+                self.__templates[template_name] = template
 
     def url(self):
         """
@@ -41,3 +59,10 @@ class Settings(object):
         the config file (parameter 'api_key')
         """
         return self.__config.get('default', 'api_key', fallback=None)
+
+    def template(self, name):
+        """
+        Returns dict with values from template 'name' or None if template
+        with such name does not exist
+        """
+        return self.__templates.get(name, None)
