@@ -12,8 +12,13 @@ class Settings(object):
         def __init__(self, template_name):
             self.template_name = template_name
 
+    class InvalidTemplateKey(Exception):
+        def __init__(self, key, section):
+            self.key = key
+            self.section = section
+
     """Singleton class that provides access to run-time settings"""
-    __instance = None
+    __instances = {}
     VALID_TEMPLATE_KEYS = [
         'product',
         'component',
@@ -21,14 +26,18 @@ class Settings(object):
         'severity',
         'platform',
     ]
-    def __new__(cls):
-        if Settings.__instance is None:
-            Settings.__instance = object.__new__(cls)
+    def __new__(cls, config_file=None):
+        if config_file is None:
             home = os.path.expanduser('~')
             config_file = os.path.join(home, '.scarabrc')
-            Settings.__instance.load_file(config_file)
 
-        return Settings.__instance
+        if config_file in Settings.__instances:
+            return Settings.__instances[config_file]
+
+        instance = object.__new__(cls)
+        instance.load_file(config_file)
+        Settings.__instances[config_file] = instance
+        return instance
 
     def load_file(self, path):
         """Load ini file specified by path"""
@@ -43,8 +52,7 @@ class Settings(object):
             template = {}
             for key in self.__config[section]:
                 if not key in self.VALID_TEMPLATE_KEYS:
-                    raise Exception("Invalid template key '{}' " \
-                        "in section '{}'".format(key, section))
+                    raise self.InvalidTemplateKey(key, section)
                 template[key] = self.__config[section][key]
                 self.__templates[template_name] = template
 
