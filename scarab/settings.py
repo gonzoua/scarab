@@ -8,12 +8,18 @@ import os
 import urllib
 
 class Settings(object):
+    class TemplateNotFound(Exception):
+        def __init__(self, template_name):
+            self.template_name = template_name
+
     """Singleton class that provides access to run-time settings"""
     __instance = None
     VALID_TEMPLATE_KEYS = [
         'product',
         'component',
         'version',
+        'severity',
+        'platform',
     ]
     def __new__(cls):
         if Settings.__instance is None:
@@ -62,7 +68,22 @@ class Settings(object):
 
     def template(self, name):
         """
+        Returns dict with values from template 'name' or raises KeyError
+        if it doesn't exist
+        """
+        if name in self.__templates:
+            return self.__templates[name]
+
+        raise self.TemplateNotFound(name)
+
+    def combine_templates(self, names):
+        """
         Returns dict with values from template 'name' or None if template
         with such name does not exist
         """
-        return self.__templates.get(name, None)
+        result = {}
+        for name in names:
+            template = self.template(name)
+            result.update(template)
+
+        return result

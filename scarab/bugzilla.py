@@ -199,7 +199,7 @@ class Bugzilla(object):
     @xmlrpc_method
     def submit(self, product, component, version, summary, \
             description=None, cc_list=None, platform=None,
-            priority=None, severity=None):
+            severity=None):
         """
         Submit new bug
         Args:
@@ -209,8 +209,8 @@ class Bugzilla(object):
             summary (string): one-line summary of the bug
             description (string, optional): description of the bug
             cc_list (list, optional): list of users' emails to add to Cc list of the bug
-            priotiry (string, optional): bug priority
             severity (string, optional): bug severity
+            platform (string, optional): platform where bug was found
         """
         args = self.__common_args()
         args['product'] = product
@@ -223,8 +223,6 @@ class Bugzilla(object):
             args['cc'] = cc_list
         if platform:
             args['platform'] = platform
-        if priority:
-            args['priority'] = priority
         if severity:
             args['severity'] = severity
         reply = self.__proxy.Bug.create(args)

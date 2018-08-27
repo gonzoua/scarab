@@ -5,6 +5,7 @@ Implementation of 'submit' command
 """
 
 from ..context import bugzilla_instance, settings_instance
+from ..settings import Settings
 from ..bugzilla import BugzillaError
 from .. import ui
 from .base import Base
@@ -16,8 +17,8 @@ class Command(Base):
         """Register parser for 'submit' command"""
         parser = subparsers.add_parser('submit')
         parser.set_defaults(func=self.run)
-        parser.add_argument('-t', '--template', dest='template', \
-            help='name of the pre-configured bug template')
+        parser.add_argument('-t', '--template', dest='templates', \
+            action='append', help='name of the pre-configured bug template')
         parser.add_argument('-p', '--product', dest='product', \
             help='name of the product')
         parser.add_argument('-c', '--component', dest='component', \
@@ -29,18 +30,32 @@ class Command(Base):
         parser.add_argument('-d', '--description', dest='description', help='description text')
         parser.add_argument('-C', '--cc', dest='cc', \
             action='append', help='users to add to CC list (can be specified multiple times)')
+        parser.add_argument('-F', '--platform', dest='platform', help='platform')
+        parser.add_argument('-S', '--severity', dest='severity', help='severity')
+        parser.add_argument('-P', '--priority', dest='priority', help='priority')
 
     def run(self, args):
         """Implement 'submit' command"""
 
         template = None
-        if args.template:
-            template = settings_instance().template(args.template)
+        try:
+            if args.templates:
+                template = settings_instance().combine_templates(args.templates)
+        except Settings.TemplateNotFound as ex:
+            ui.fatal("Template '{}' is not defined".format(ex.template_name))
+
+        product = None
+        component = None
+        version = None
+        severity = None
+        platform = None
 
         if template:
             product = template.get('product', None)
             component = template.get('component', None)
             version = template.get('version', None)
+            severity = template.get('severity', None)
+            platform = template.get('platform', None)
 
         # Values specified from command line override
         # values from template
@@ -50,6 +65,10 @@ class Command(Base):
             component = args.component
         if args.version:
             version = args.version
+        if args.severity:
+            severity = args.severity
+        if args.platform:
+            platform = args.platform
 
         # product, component and version
         if product is None:
@@ -66,7 +85,8 @@ class Command(Base):
         bugzilla = bugzilla_instance()
         try:
             bug = bugzilla.submit(product, component, version, summary, \
-                description=description, cc_list=cc_list)
+                description=description, cc_list=cc_list, severity=severity, \
+                platform=platform)
             print(bug)
         except BugzillaError as exc:
             ui.fatal('Bugzilla error: {}'.format(exc.message))
