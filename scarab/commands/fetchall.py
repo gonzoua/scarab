@@ -37,7 +37,7 @@ class Command(Base):
                 file_name = orig_file_name + '.' + str(i)
                 i += 1
 
-            ui.log("Downloading attachment #{} to {}".format(attachment.object_id, file_name))
+            ui.output("Downloading attachment #{} to {}".format(attachment.object_id, file_name))
             try:
                 attachment = bugzilla.attachment(attachment.object_id, data=True)
             except BugzillaError as ex:

@@ -65,4 +65,4 @@ class Command(Base):
             row_format = '  '.join(column_formats)
             row_format += ' {}'
             for row in rows:
-                ui.log(row_format.format(*row))
+                ui.output(row_format.format(*row))

@@ -12,5 +12,9 @@ def fatal(line):
     sys.exit(1)
 
 def log(line):
-    """Log message"""
+    """Log debug/error message"""
     sys.stderr.write('{}\n'.format(line))
+
+def output(line):
+    """Output normal message"""
+    sys.stdout.write('{}\n'.format(line))

@@ -27,10 +27,10 @@ class Command(Base):
             ui.fatal('Bugzilla error: {}'.format(exc.message))
 
         for product in products:
-            ui.log("Product '{}':".format(product.name))
-            ui.log('  components:')
+            ui.output("Product '{}':".format(product.name))
+            ui.output('  components:')
             for component in product.components:
-                ui.log('    {}'.format(component.name))
-            ui.log('  versions:')
+                ui.output('    {}'.format(component.name))
+            ui.output('  versions:')
             for version in product.versions:
-                ui.log('    {}'.format(version.name))
+                ui.output('    {}'.format(version.name))

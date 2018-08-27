@@ -47,7 +47,7 @@ class Command(Base):
                 i += 1
 
         desc_name = 'standard out' if file_name == '-' else file_name
-        ui.log("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
+        ui.output("Downloading attachment #{} to {}".format(attachment.object_id, desc_name))
         try:
             attachment = bugzilla.attachment(args.attachment_id, data=True)
         except BugzillaError as ex:
