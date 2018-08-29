@@ -7,6 +7,8 @@ import configparser
 import os
 import urllib
 
+from . import ui
+
 class Settings(object):
     class TemplateNotFound(Exception):
         def __init__(self, template_name):
@@ -29,20 +31,29 @@ class Settings(object):
     def __new__(cls, config_file=None):
         if config_file is None:
             home = os.path.expanduser('~')
-            config_file = os.path.join(home, '.scarabrc')
+            path = os.path.join(home, '.scarabrc')
+            if os.path.exists(path):
+                config_file = path
 
         if config_file in Settings.__instances:
             return Settings.__instances[config_file]
 
         instance = object.__new__(cls)
-        instance.load_file(config_file)
+        if not config_file is None:
+            try:
+                instance.load_file(config_file)
+            except IOError as ex:
+                ui.fatal("Error reading config file:\n{}".format(ex))
+            except configparser.Error as ex:
+                ui.fatal("Error reading config file:\n{}".format(ex))
+
         Settings.__instances[config_file] = instance
         return instance
 
     def load_file(self, path):
         """Load ini file specified by path"""
         self.__config = configparser.ConfigParser()
-        self.__config.read(path)
+        self.__config.read_file(open(path))
         self.__templates = {}
         # Parse template
         for section in self.__config:

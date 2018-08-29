@@ -19,6 +19,7 @@ def create_parser():
         argparse.ArgumentParser object with all available subcommands
     """
     parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', dest='config', help='config file')
     subparsers = parser.add_subparsers(title="commands", dest="command")
     for entry in walk_packages(__path__, __name__ + '.'):
         try:
