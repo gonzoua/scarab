@@ -38,12 +38,16 @@ class Command(Base):
         except IOError as ex:
             ui.fatal('error reading file: {}'.format(str(ex)))
 
+        comment = args.comment
+        if comment is None:
+            comment = ui.edit_message()
+
         # Try and guess file content type
         if content_type is None:
             mime = magic.Magic(mime=True)
             content_type = mime.from_file(args.attachment)
         try:
             bugzilla.add_attachment(args.pr, args.attachment, data, \
-                summary=args.summary, comment=args.comment, content_type=content_type)
+                summary=args.summary, comment=comment, content_type=content_type)
         except BugzillaError as ex:
             ui.fatal('Bugzilla error: {}'.format(ex.message))

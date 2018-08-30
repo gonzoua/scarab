@@ -21,13 +21,14 @@ class Command(Base):
             action='append', help='name of the pre-configured bug template')
         parser.add_argument('-p', '--product', dest='product', \
             help='name of the product')
-        parser.add_argument('-c', '--component', dest='component', \
+        parser.add_argument('-m', '--component', dest='component', \
             help='name of the component')
         parser.add_argument('-v', '--version', dest='version', \
             help='version value')
+        parser.add_argument('-c', '--comment', dest='comment', \
+            help='comment describing the bug')
         parser.add_argument('-s', '--summary', dest='summary', \
-            required=True, help='summary for the attachment')
-        parser.add_argument('-d', '--description', dest='description', help='description text')
+            required=True, help='summary for the bug')
         parser.add_argument('-C', '--cc', dest='cc', \
             action='append', help='users to add to CC list (can be specified multiple times)')
         parser.add_argument('-F', '--platform', dest='platform', help='platform')
@@ -79,13 +80,16 @@ class Command(Base):
             ui.fatal('version value was not specified')
 
         summary = args.summary
-        description = args.description
         cc_list = args.cc
+
+        comment = args.comment
+        if comment is None:
+            comment = ui.edit_message()
 
         bugzilla = bugzilla_instance()
         try:
             bug = bugzilla.submit(product, component, version, summary, \
-                description=description, cc_list=cc_list, severity=severity, \
+                description=comment, cc_list=cc_list, severity=severity, \
                 platform=platform)
             print(bug)
         except BugzillaError as exc:
