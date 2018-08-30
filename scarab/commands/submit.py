@@ -33,7 +33,6 @@ class Command(Base):
             action='append', help='users to add to CC list (can be specified multiple times)')
         parser.add_argument('-F', '--platform', dest='platform', help='platform')
         parser.add_argument('-S', '--severity', dest='severity', help='severity')
-        parser.add_argument('-P', '--priority', dest='priority', help='priority')
 
     def run(self, args):
         """Implement 'submit' command"""
