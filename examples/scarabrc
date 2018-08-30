@@ -1,0 +1,39 @@
+[default]
+# This is a default value and can be omitted
+url = https://bugs.freebsd.org/bugzilla
+# required for attach and submit commands
+api_key = AI2HopK8qVSzXU2rT4bpAQFaujFiJBuPyxxc0rSH
+
+# template section accepts following key names:
+# product, component, version, platform, severity
+# Values should not have quotes.
+# Templates are merged when several are specified multiple types,
+# see following examples
+#
+# Submit kern PR with default severity:
+# scarab submit -s 'IRQ storm on my NIC' -t kern
+#
+# Submit kern PR with the bug that affects many people
+# scarab submit -s 'Kernel panic on boot' -t kern -t many
+# 
+# Submit port update
+# scarab submit -s 'sysutils/tool: update to 1.42' -t ports
+# 
+# Submit port bug on ARM platform
+# scarab submit -s 'sysutils/tool: build fails on ARM' -t ports -t arm
+
+[template:kern]
+product = Base System
+component = kern
+version = CURRENT
+
+[template:ports]
+product = Ports & Packages
+component = Individual Port(s)
+version = Latest
+
+[template:arm]
+platform = arm
+
+[template:many]
+severity = Affects Many People
