@@ -39,7 +39,7 @@ setup(
     long_description = long_description,
     url = 'https://github.com/gonzoua/scarab',
     author = 'Oleksandr Tymoshenko',
-    author_email = 'gonzo@FreeBSD.org',
+    author_email = 'gonzo@bluezbox.com',
     license = 'BSD 3-clause "New" or "Revised License"',
     classifiers = [
 	'Development Status :: 3 - Alpha',
