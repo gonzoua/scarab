@@ -39,6 +39,7 @@ class Settings(object):
             return Settings.__instances[config_file]
 
         instance = object.__new__(cls)
+        instance.__config = configparser.ConfigParser()
         if not config_file is None:
             try:
                 instance.load_file(config_file)
@@ -52,7 +53,6 @@ class Settings(object):
 
     def load_file(self, path):
         """Load ini file specified by path"""
-        self.__config = configparser.ConfigParser()
         self.__config.read_file(open(path))
         self.__templates = {}
         # Parse template
