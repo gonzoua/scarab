@@ -34,7 +34,6 @@ class Command(Base):
         try:
             with open(args.attachment, 'rb') as attach_file:
                 data = attach_file.read()
-                data = b64encode(data)
         except IOError as ex:
             ui.fatal('error reading file: {}'.format(str(ex)))
 
