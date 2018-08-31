@@ -47,7 +47,10 @@ class Command(Base):
             mime = magic.Magic(mime=True)
             content_type = mime.from_file(args.attachment)
         try:
-            bugzilla.add_attachment(args.pr, args.attachment, data, \
+            attachment = bugzilla.add_attachment(args.pr, args.attachment, data, \
                 summary=args.summary, comment=comment, content_type=content_type)
         except BugzillaError as ex:
             ui.fatal('Bugzilla error: {}'.format(ex.message))
+        ui.output('New attachment {} has been added to bug {}'.format(attachment, args.pr))
+        ui.output('Attachment URL: {}'.format(bugzilla.attachment_url(attachment)))
+        ui.output('Bug URL: {}'.format(bugzilla.bug_url(args.pr)))

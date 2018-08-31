@@ -5,6 +5,7 @@ Wrapper class for Bugzilla's XML-RPC API
 
 import xmlrpc.client
 from datetime import datetime, timezone
+import urllib
 
 class BugzillaError(Exception):
     """
@@ -96,11 +97,27 @@ class Bugzilla(object):
     __api_key = None
 
     def __init__(self, url):
-        self.__proxy = xmlrpc.client.ServerProxy(url)
+        self.__base_url = url
+        if not self.__base_url.endswith('/'):
+            self.__base_url += '/'
+        xmlrpc_url = self.__url('xmlrpc.cgi')
+        self.__proxy = xmlrpc.client.ServerProxy(xmlrpc_url)
 
     def set_api_key(self, api_key):
         """Set API key for current session"""
         self.__api_key = api_key
+
+    def bug_url(self, bug):
+        url = 'show_bug.cgi?id={}'.format(bug)
+        return self.__url(url)
+
+    def attachment_url(self, attachment):
+        url = 'attachment.cgi?id={}&action=edit'.format(attachment)
+        return self.__url(url)
+
+    def __url(self, relative_url):
+        """Returns absolute URL for relative_url using bugzilla URL as a base"""
+        return urllib.parse.urljoin(self.__base_url, relative_url)
 
     def __common_args(self):
         """Initialize part of parameters common for all XML-RPC methods"""

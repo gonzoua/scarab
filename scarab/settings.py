@@ -5,7 +5,6 @@ Representation of scarab's run-time settings
 
 import configparser
 import os
-import urllib
 
 from . import ui
 
@@ -69,14 +68,14 @@ class Settings(object):
 
     def url(self):
         """
-        Returns bugzilla base URL configured in [global]
-        section of the config file (parameter 'bugzilla')
+        Returns bugzilla base URL configured in [default]
+        section of the config file (parameter 'url')
         """
         base = self.__config.get('default', 'url', \
             fallback='https://bugs.freebsd.org/bugzilla/')
         if not base.endswith('/'):
             base += '/'
-        return urllib.parse.urljoin(base, 'xmlrpc.cgi')
+        return base
 
     def api_key(self):
         """

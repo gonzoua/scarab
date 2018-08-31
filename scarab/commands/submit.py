@@ -90,6 +90,8 @@ class Command(Base):
             bug = bugzilla.submit(product, component, version, summary, \
                 description=comment, cc_list=cc_list, severity=severity, \
                 platform=platform)
-            print(bug)
         except BugzillaError as exc:
             ui.fatal('Bugzilla error: {}'.format(exc.message))
+
+        ui.output('New bug {} has been submitted'.format(bug))
+        ui.output('Bug URL: {}'.format(bugzilla.bug_url(bug)))
