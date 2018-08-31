@@ -48,6 +48,8 @@ def edit_message(initial_message = None):
     with open(name, 'r') as tf:
         message = tf.read()
 
+    os.unlink(name)
+
     lines = message.split('\n')
     lines = [l for l in lines if not l.startswith('# SCARAB:')]
     message = '\n'.join(lines).strip()
