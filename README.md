@@ -38,7 +38,7 @@ API key for the operations. Normally commands that do not modify Bugzilla's stat
 
 ## [template:NNN] sections
 
-Templates are sets of fields that you can use when submitting new PRs instead of specifying them individually as command-line arguments. Valid keys for this kind of section are: `product`, `component`, `version`, `platform`, `severity`. Possible values depend on the actual Bugzilla instance configuration. Some of them can be inspected using `products` command. The part of the section name after the colon is used as an argument to `-t` switch of the `submit` command as a shorthand for multiple switches.
+Templates are sets of fields that you can use when submitting new PRs instead of specifying them individually as command-line arguments. Valid keys for this kind of section are: `product`, `component`, `version`, `platform`, `severity`. Possible values depend on the actual Bugzilla instance configuration. Some of them can be inspected using `products` command. The part of the section name after the colon is used as an argument to `-t` switch of the `submit` command as a shorthand for multiple switches. For more examples of template usage see [scarabrc](examples/scarabrc).
 
 # Commands
 ## attach
