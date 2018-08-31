@@ -3,15 +3,22 @@ scarab is a CLI tool to automate some of the Bugzilla-related workflows in the F
 
 # Installation
 ```
+# Install python3 and pip 
 sudo pkg install python3 py36-pip
+
+# Install latest release of scarab
+pip-3.6 install --user scarab
+# .. or current WIP
 git clone https://github.com/gonzoua/scarab.git
 cd scarab
 pip-3.6 install --user -e .
+
 # Add ~/.local/bin to PATH
 # for bash:
 export PATH=$PATH:~/.local/bin
 # for tcsh/csh:
 setenv PATH $PATH\:$HOME/.local/bin
+
 # test setup
 scarab products
 ```
