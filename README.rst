@@ -2,16 +2,35 @@
 scarab is a CLI tool to automate some of the Bugzilla-related workflows in the FreeBSD project.
 
 # Installation
-TBD
+```
+sudo pkg install python3 py36-pip
+git clone https://github.com/gonzoua/scarab.git
+cd scarab
+pip-3.6 install --user -e .
+# Add ~/.local/bin to PATH
+# for bash:
+export PATH=$PATH:~/.local/bin
+# for tcsh/csh:
+setenv PATH $PATH\:$HOME/.local/bin
+# test setup
+scarab products
+```
 
 # Settings
 scarab config file has a generic section-based INI format. A section starts with [sectionname]  and consists of key/value pairs separated by "=". Value is the part of the line after "=" with leading and trailing spaces removed.  If there are spaces in the middle of the string, they're treated as a part of the value.
+
 ## [default] section
+
 ### url
+
 Base URL  for Bugzilla setup. By default, it's FreeBSD's Bugzilla instance https://bugs.freebsd.org/bugzilla/
+
 ### api_key
+
 API key for the operations. Normally commands that do not modify Bugzilla's state like `fetch`, `fetchall`, `file` do not require it, unless you're trying to access PRs with restricted access. To generate new API key login to your Bugzilla instance, click on "Preferences" link then select "API keys" tab, check "Generate a new API key ..." checkbox, provide an optional description and click "Submit Changes"
+
 ## [template:NNN] sections
+
 Templates are sets of fields that you can use when submitting new PRs instead of specifying them individually as command-line arguments. Valid keys for this kind of section are: `product`, `component`, `version`, `platform`, `severity`. Possible values depend on the actual Bugzilla instance configuration. Some of them can be inspected using `products` command. The part of the section name after the colon is used as an argument to `-t` switch of the `submit` command as a shorthand for multiple switches.
 
 # Commands
