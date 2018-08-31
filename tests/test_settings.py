@@ -68,7 +68,7 @@ def test_defaults(monkeypatch):
 
 def test_valid_config(bare_config_path):
     settings = Settings(bare_config_path)
-    assert settings.url() == 'server/xmlrpc.cgi'
+    assert settings.url() == 'server/'
     assert settings.api_key() == 'key'
 
 def test_single_template(full_config_path):
