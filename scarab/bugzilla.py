@@ -57,6 +57,48 @@ class Attachment(object):
     def __repr__(self):
         return "Attachment(%d, '%s')" % (self.object_id, self.file_name)
 
+class Bug(object):
+    """Bugzilla bug representation"""
+    def __init__(self, d):
+        self.object_id = int(d['id'])
+        self.summary = d['summary']
+        self.product = d['product']
+        self.version = d['version']
+        self.os = d['op_sys']
+        self.status = d['status']
+        self.resolution = d['resolution']
+        self.severity = d['severity']
+        self.priority = d['priority']
+        self.component = d['component']
+        self.assigned_to = User(d['assigned_to_detail'])
+        self.creator = User(d['creator_detail'])
+        time_tuple = d['creation_time'].timetuple()
+        # Convert from UTC to local timezone
+        self.creation_time = datetime(*time_tuple[0:6], tzinfo=timezone.utc).astimezone(tz=None)
+        time_tuple = d['last_change_time'].timetuple()
+        # Convert from UTC to local timezone
+        self.last_change_time = datetime(*time_tuple[0:6], tzinfo=timezone.utc).astimezone(tz=None)
+
+    def __repr__(self):
+        return "Bug(%d, '%s')" % (self.object_id, self.summary)
+
+class User(object):
+    """Bugzilla user representation"""
+    def __init__(self, d):
+        self.object_id = int(d['id'])
+        self.name = d['name']
+        self.real_name = d['real_name']
+        self.email = d['email']
+
+    def __str__(self):
+        if self.real_name:
+            return '{} <{}>'.format(self.real_name, self.email)
+        else:
+            return self.email
+
+    def __repr__(self):
+        return "User(%d, '%s')" % (self.object_id, self.name)
+
 class Product(object):
     """Bugzilla product representation"""
 
@@ -244,3 +286,35 @@ class Bugzilla(object):
             args['severity'] = severity
         reply = self.__proxy.Bug.create(args)
         return reply['id']
+
+    @xmlrpc_method
+    def bug(self, bug_id):
+        """
+        Get information for bug wiht id bug_id
+        Args:
+            bug_id (int): bug ID
+        Returns:
+            Bugzilla::Bug object
+        """
+        args = self.__common_args()
+        args['ids'] = [bug_id]
+        reply = self.__proxy.Bug.get(args)
+        bug = Bug(reply['bugs'][0])
+
+        return bug
+
+    @xmlrpc_method
+    def bug_description(self, bug_id):
+        """
+        Get comment #0 (description) for bug wiht id bug_id
+        Args:
+            bug_id (int): bug ID
+        Returns:
+            str with the text of bug description
+        """
+        args = self.__common_args()
+        args['ids'] = [bug_id]
+        reply = self.__proxy.Bug.comments(args)
+        description = reply['bugs'][str(bug_id)]['comments'][0]['text']
+
+        return description
