@@ -61,6 +61,11 @@ files [-h] [-a] [-s] bug_id
 
 Show list of the files attached to the bug with id `bug_id`. Unless `-a` is specified only non-obsolete attachments are displayed. When `-s` is used, the summary of the attachment is displayed instead of the file name.
 
+## info
+info [-h] bug_id
+
+Display information for bug bug_id including bug description
+
 ## products
 products [-h]
 
