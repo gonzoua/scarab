@@ -241,6 +241,41 @@ class Bugzilla(object):
         return None
 
     @xmlrpc_method
+    def update(self, bug_id, status=None, \
+        resolution=None, assigned_to=None,
+        add_cc=None, remove_cc=None, comment=None):
+        """
+        Modify existing PR
+        Args:
+            bug_id (int): bug ID
+            status (str, optional): new status value
+            resolution (str, optional): new resolution value
+            assigned_to (str, optional): user to assign PR to
+            add_cc (list, optional): list of email to be added to Cc
+            remove_cc (list, optional): list of email to be removed from Cc
+            comment (str, optional): comment to be associated with the change
+        """
+        args = self.__common_args()
+        args['ids'] = [bug_id]
+        if status is not None:
+            args['status'] = status
+        if resolution is not None:
+            args['resolution'] = resolution
+        if assigned_to is not None:
+            args['assigned_to'] = assigned_to
+        cc = {}
+        if add_cc:
+            cc['add'] = add_cc
+        if remove_cc:
+            cc['remove'] = remove_cc
+        if len(cc) > 0:
+            args['cc'] = cc
+        if comment is not None:
+            args['comment'] = { 'body': comment }
+        reply = self.__proxy.Bug.update(args)
+        return None
+
+    @xmlrpc_method
     def products(self):
         """
         Returns list of Product objects representing
