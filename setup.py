@@ -28,9 +28,10 @@ class RunTests(Command):
 
     def run(self):
         """Run all tests!"""
-        errno = call(['py.test', '--cov=scarab', '--cov-report=term-missing'])
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(['--cov=scarab', '--cov-report=term-missing'])
         raise SystemExit(errno)
-
 
 setup(
     name = 'scarab',
