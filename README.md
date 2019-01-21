@@ -42,9 +42,9 @@ Templates are sets of fields that you can use when submitting new PRs instead of
 
 # Commands
 ## attach
-attach [-h] [-s SUMMARY] [-c COMMENT] [-t CONTENT_TYPE] attachment pr
+attach [-h] [-s SUMMARY] [-c COMMENT | -F COMMENT_FILE] [-t CONTENT_TYPE] attachment pr
 
-Attach file specified by the path `attachment` to the bug with id `pr`. If no summary provided the file name is used as a summary. If `-c` is not specified tool will invoke editor so a user can enter the comment text. File content type is detecting automatically using libmagic and can be overridden by `-t` command-line switch.
+Attach file specified by the path `attachment` to the bug with id `pr`. If no summary provided the file name is used as a summary. If neither `-c` nor `-F` is specified tool will invoke editor so a user can enter the comment text. File content type is detecting automatically using libmagic and can be overridden by `-t` command-line switch.
 
 ## fetch
 fetch [-h] [-o OUTPUT] attachment_id
@@ -72,9 +72,14 @@ products [-h]
 Display list of products, their components and versions
 
 ## submit
-submit [-h] [-t TEMPLATES] [-p PRODUCT] [-m COMPONENT] [-v VERSION] [-c COMMENT] -s SUMMARY [-C CC] [-F PLATFORM] [-S SEVERITY]
+submit [-h] [-t TEMPLATES] [-p PRODUCT] [-m COMPONENT] [-v VERSION] [-c COMMENT | -F COMMENT_FILE] -s SUMMARY [-C CC] [-P PLATFORM] [-S SEVERITY]
 
 Submit new bug with the summary specified by `-s` command-line switch. Mandatory fields `product`, `component`, `version` should be specified either by command-line switches or as values in templates sections. If multiple templates are specified in one invocation, they are merged with fields each following template overriding values present in the previous ones. Values for the fields provided as a command-line switch override the values in the templates.
+
+## update
+update [-h] [-s STATUS] [-r RESOLUTION] [-a ASSIGNED_TO] [-C ADD_CC] [-X REMOVE_CC] [-c COMMENT | -F COMMENT_FILE] bug_id
+
+Update fields in existing PR. If neither `-c` nor `-F` specified no comment is posted with the change. `-C` and `-X` can be specified multiple times to add/remove more than one user.
 
 # Development
 To run the scarab command using checked out version of the repo use `python3 -m scarab.cli ...` command
