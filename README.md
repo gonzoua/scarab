@@ -75,3 +75,6 @@ Display list of products, their components and versions
 submit [-h] [-t TEMPLATES] [-p PRODUCT] [-m COMPONENT] [-v VERSION] [-c COMMENT] -s SUMMARY [-C CC] [-F PLATFORM] [-S SEVERITY]
 
 Submit new bug with the summary specified by `-s` command-line switch. Mandatory fields `product`, `component`, `version` should be specified either by command-line switches or as values in templates sections. If multiple templates are specified in one invocation, they are merged with fields each following template overriding values present in the previous ones. Values for the fields provided as a command-line switch override the values in the templates.
+
+# Development
+To run the scarab command using checked out version of the repo use `python3 -m scarab.cli ...` command
