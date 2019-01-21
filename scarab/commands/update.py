@@ -5,8 +5,9 @@
 """
 
 from base64 import b64encode
-
+import argparse
 import magic
+
 from ..bugzilla import BugzillaError
 from ..context import bugzilla_instance
 
@@ -26,13 +27,19 @@ class Command(Base):
         parser.add_argument('-a', '--assigned-to', dest='assigned_to', help='user to assign PR to')
         parser.add_argument('-C', '--add-cc', dest='add_cc', action='append', help='email to add to Cc (can be specified multiple times)')
         parser.add_argument('-X', '--remove-cc', dest='remove_cc', action='append', help='email to remove from Cc (can be specified multiple times)')
-        parser.add_argument('-c', '--comment', dest='comment', help='comment text')
+        comment_group = parser.add_mutually_exclusive_group()
+        comment_group.add_argument('-c', '--comment', dest='comment', help='comment text')
+        comment_group.add_argument('-F', '--comment-file', dest='comment_file', \
+            type=argparse.FileType('r'), help='file with comment text')
 
     def run(self, args):
         """Run 'update' command"""
         bugzilla = bugzilla_instance()
 
         comment = args.comment
+        if comment is None:
+            if args.comment_file:
+                comment = args.comment_file.read()
 
         if not (args.status or args.resolution or args.assigned_to \
           or args.add_cc or args.remove_cc or comment):
@@ -42,6 +49,6 @@ class Command(Base):
             attachment = bugzilla.update(args.pr, status=args.status,
               resolution=args.resolution, assigned_to=args.assigned_to,
               add_cc=args.add_cc, remove_cc=args.remove_cc,
-              comment=args.comment)
+              comment=comment)
         except BugzillaError as ex:
             ui.fatal('Bugzilla error: {}'.format(ex.message))

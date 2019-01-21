@@ -5,6 +5,7 @@
 """
 
 from base64 import b64encode
+import argparse
 
 import magic
 from ..bugzilla import BugzillaError
@@ -23,7 +24,10 @@ class Command(Base):
         parser.add_argument('attachment', type=str, help='path to the attachment')
         parser.add_argument('pr', type=int, help='PR number')
         parser.add_argument('-s', '--summary', dest='summary', help='summary for the attachment')
-        parser.add_argument('-c', '--comment', dest='comment', help='comment text')
+        comment_group = parser.add_mutually_exclusive_group()
+        comment_group.add_argument('-c', '--comment', dest='comment', help='comment text')
+        comment_group.add_argument('-F', '--comment-file', dest='comment_file', \
+            type=argparse.FileType('r'), help='file with comment text')
         parser.add_argument('-t', '--content-type', dest='content_type', help='file content type')
 
     def run(self, args):
@@ -38,6 +42,9 @@ class Command(Base):
             ui.fatal('error reading file: {}'.format(str(ex)))
 
         comment = args.comment
+        if comment is None:
+            if args.comment_file:
+                comment = args.comment_file.read()
         if comment is None:
             comment = ui.edit_message()
 

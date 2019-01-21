@@ -4,6 +4,8 @@
 Implementation of 'submit' command
 """
 
+import argparse
+
 from ..context import bugzilla_instance, settings_instance
 from ..settings import Settings
 from ..bugzilla import BugzillaError
@@ -25,13 +27,16 @@ class Command(Base):
             help='name of the component')
         parser.add_argument('-v', '--version', dest='version', \
             help='version value')
-        parser.add_argument('-c', '--comment', dest='comment', \
+        comment_group = parser.add_mutually_exclusive_group()
+        comment_group.add_argument('-c', '--comment', dest='comment', \
             help='comment describing the bug')
+        comment_group.add_argument('-F', '--comment-file', dest='comment_file', \
+            type=argparse.FileType('r'), help='file with comment text')
         parser.add_argument('-s', '--summary', dest='summary', \
             required=True, help='summary for the bug')
         parser.add_argument('-C', '--cc', dest='cc', \
             action='append', help='users to add to CC list (can be specified multiple times)')
-        parser.add_argument('-F', '--platform', dest='platform', help='platform')
+        parser.add_argument('-P', '--platform', dest='platform', help='platform')
         parser.add_argument('-S', '--severity', dest='severity', help='severity')
 
     def run(self, args):
@@ -82,6 +87,9 @@ class Command(Base):
         cc_list = args.cc
 
         comment = args.comment
+        if comment is None:
+            if args.comment_file:
+                comment = args.comment_file.read()
         if comment is None:
             comment = ui.edit_message()
 
