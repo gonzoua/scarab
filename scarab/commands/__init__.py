@@ -10,6 +10,7 @@ from importlib import import_module
 from pkgutil import walk_packages
 
 from .. import ui
+from .. import __version__
 
 def create_parser():
     """
@@ -20,6 +21,8 @@ def create_parser():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', dest='config', help='config file')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+
     subparsers = parser.add_subparsers(title="commands", dest="command")
     for entry in walk_packages(__path__, __name__ + '.'):
         try:
