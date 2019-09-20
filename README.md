@@ -41,6 +41,11 @@ API key for the operations. Normally commands that do not modify Bugzilla's stat
 Templates are sets of fields that you can use when submitting new PRs instead of specifying them individually as command-line arguments. Valid keys for this kind of section are: `product`, `component`, `version`, `platform`, `severity`. Possible values depend on the actual Bugzilla instance configuration. Some of them can be inspected using `products` command. The part of the section name after the colon is used as an argument to `-t` switch of the `submit` command as a shorthand for multiple switches. For more examples of template usage see [scarabrc](examples/scarabrc).
 
 # Commands
+## addflag
+addflag [-h] bug_id name [requestee]
+
+Add new flag named name to bug bug_id. If flag can be requested from specific user they can be specified by an optional requestee argument.
+
 ## attach
 attach [-h] [-s SUMMARY] [-c COMMENT | -F COMMENT_FILE] [-t CONTENT_TYPE] attachment pr
 
@@ -66,10 +71,25 @@ info [-h] bug_id
 
 Display information for bug bug_id including bug description
 
+## lsfalgs
+lsflags [-h] bug_id
+
+Display flags for bug bug_id.
+
 ## products
 products [-h]
 
 Display list of products, their components and versions
+
+## rmflags
+rmflags [-h] bug_id name [name ...]
+
+Remove one or more flags from bug bug_id. name can be either flag name or numeric flag id, if there are more than one flag with the same name.
+
+## setflag
+setflag [-h] bug_id name {+,-}
+
+Change flag value to either + or -. name can be either flag name or number flag id.
 
 ## submit
 submit [-h] [-t TEMPLATES] [-p PRODUCT] [-m COMPONENT] [-v VERSION] [-c COMMENT | -F COMMENT_FILE] -s SUMMARY [-C CC] [-P PLATFORM] [-S SEVERITY]

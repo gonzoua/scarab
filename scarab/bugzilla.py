@@ -57,6 +57,17 @@ class Attachment(object):
     def __repr__(self):
         return "Attachment(%d, '%s')" % (self.object_id, self.file_name)
 
+class Flag(object):
+    """Bugzilla flag representation"""
+    def __init__(self, d):
+        self.object_id = int(d['id'])
+        self.name = d['name']
+        self.requestee = d.get('requestee', '')
+        self.status = d['status']
+
+    def __repr__(self):
+        return "Flag(%d, '%s')" % (self.object_id, self.name)
+
 class Bug(object):
     """Bugzilla bug representation"""
     def __init__(self, d):
@@ -78,6 +89,9 @@ class Bug(object):
         time_tuple = d['last_change_time'].timetuple()
         # Convert from UTC to local timezone
         self.last_change_time = datetime(*time_tuple[0:6], tzinfo=timezone.utc).astimezone(tz=None)
+        self.flags = []
+        for df in d['flags']:
+            self.flags.append(Flag(df))
 
     def __repr__(self):
         return "Bug(%d, '%s')" % (self.object_id, self.summary)
@@ -353,3 +367,70 @@ class Bugzilla(object):
         description = reply['bugs'][str(bug_id)]['comments'][0]['text']
 
         return description
+
+    @xmlrpc_method
+    def add_flag(self, bug_id, name, requestee):
+        """
+        Add new flag to bug bug_id with value ?
+        Args:
+            bug_id (int): bug ID
+            name (str): flag name or numberic id of flag instance
+            requestee (str): requestee for flag or None
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        d = {'name': name, 'status': '?', 'new': True}
+        if requestee:
+            d['requestee'] = requestee
+        args['ids'] = [bug_id]
+        args['flags'] = [d]
+        reply = self.__proxy.Bug.update(args)
+        return None
+
+    @xmlrpc_method
+    def rm_flags(self, bug_id, names):
+        """
+        Delete flags from specified bugs
+        Args:
+            bug_id (int): bug ID
+            names (list of str): list of flag names or numberic ids of flag instance
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        flags = []
+        for name in names:
+            d = {'status': 'X'}
+
+            if name.isdigit():
+                d['id'] = int(name)
+            else:
+                d['name'] = name
+            flags.append(d)
+        args['ids'] = [bug_id]
+        args['flags'] = flags
+        reply = self.__proxy.Bug.update(args)
+        return None
+
+    @xmlrpc_method
+    def update_flag(self, bug_id, name, status):
+        """
+        Change 
+        Args:
+            bug_id (int): bug ID
+            name (str): flag name or numberic id of flag instance
+            statsus: new status, either - or +
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        d = {'status': status}
+        if name.isdigit():
+            d['id'] = int(name)
+        else:
+            d['name'] = name
+        args['ids'] = [bug_id]
+        args['flags'] = [d]
+        reply = self.__proxy.Bug.update(args)
+        return None
