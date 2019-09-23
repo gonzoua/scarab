@@ -23,6 +23,8 @@ class Command(Base):
         parser.set_defaults(func=self.run)
         parser.add_argument('attachment', type=str, help='path to the attachment')
         parser.add_argument('pr', type=int, help='PR number')
+        parser.add_argument('-b', '--batch', action='store_true', \
+            help='batch mode, only print newly created attachment\'s id')
         parser.add_argument('-s', '--summary', dest='summary', help='summary for the attachment')
         comment_group = parser.add_mutually_exclusive_group()
         comment_group.add_argument('-c', '--comment', dest='comment', help='comment text')
@@ -46,7 +48,10 @@ class Command(Base):
             if args.comment_file:
                 comment = args.comment_file.read()
         if comment is None:
-            comment = ui.edit_message()
+            if args.batch:
+                comment = ''
+            else:
+                comment = ui.edit_message()
 
         # Try and guess file content type
         if content_type is None:
@@ -57,6 +62,9 @@ class Command(Base):
                 summary=args.summary, comment=comment, content_type=content_type)
         except BugzillaError as ex:
             ui.fatal('Bugzilla error: {}'.format(ex.message))
-        ui.output('New attachment {} has been added to bug {}'.format(attachment, args.pr))
-        ui.output('Attachment URL: {}'.format(bugzilla.attachment_url(attachment)))
-        ui.output('Bug URL: {}'.format(bugzilla.bug_url(args.pr)))
+        if args.batch:
+            ui.output('{}'.format(attachment))
+        else:
+            ui.output('New attachment {} has been added to bug {}'.format(attachment, args.pr))
+            ui.output('Attachment URL: {}'.format(bugzilla.attachment_url(attachment)))
+            ui.output('Bug URL: {}'.format(bugzilla.bug_url(args.pr)))

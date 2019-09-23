@@ -19,6 +19,8 @@ class Command(Base):
         """Register parser for 'submit' command"""
         parser = subparsers.add_parser('submit')
         parser.set_defaults(func=self.run)
+        parser.add_argument('-b', '--batch', action='store_true', \
+            help='batch mode, only print newly created bug\'s id')
         parser.add_argument('-t', '--template', dest='templates', \
             action='append', help='name of the pre-configured bug template')
         parser.add_argument('-p', '--product', dest='product', \
@@ -91,7 +93,10 @@ class Command(Base):
             if args.comment_file:
                 comment = args.comment_file.read()
         if comment is None:
-            comment = ui.edit_message()
+            if args.batch:
+                comment = ''
+            else:
+                comment = ui.edit_message()
 
         bugzilla = bugzilla_instance()
         try:
@@ -101,5 +106,8 @@ class Command(Base):
         except BugzillaError as exc:
             ui.fatal('Bugzilla error: {}'.format(exc.message))
 
-        ui.output('New bug {} has been submitted'.format(bug))
-        ui.output('Bug URL: {}'.format(bugzilla.bug_url(bug)))
+        if args.batch:
+            ui.output('{}'.format(bug))
+        else:
+            ui.output('New bug {} has been submitted'.format(bug))
+            ui.output('Bug URL: {}'.format(bugzilla.bug_url(bug)))
