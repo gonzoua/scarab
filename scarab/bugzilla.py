@@ -53,6 +53,9 @@ class Attachment(object):
             self.data = d['data'].data
         else:
             self.data = b''
+        self.flags = []
+        for df in d['flags']:
+            self.flags.append(Flag(df))
 
     def __repr__(self):
         return "Attachment(%d, '%s')" % (self.object_id, self.file_name)
@@ -416,7 +419,7 @@ class Bugzilla(object):
     @xmlrpc_method
     def update_flag(self, bug_id, name, status):
         """
-        Change 
+        Change flag status
         Args:
             bug_id (int): bug ID
             name (str): flag name or numberic id of flag instance
@@ -433,4 +436,71 @@ class Bugzilla(object):
         args['ids'] = [bug_id]
         args['flags'] = [d]
         reply = self.__proxy.Bug.update(args)
+        return None
+
+    @xmlrpc_method
+    def add_aflag(self, attachment_id, name, requestee):
+        """
+        Add new flag to attachment attachment_id with value ?
+        Args:
+            attachment_id (int): attachment ID
+            name (str): flag name or numberic id of flag instance
+            requestee (str): requestee for flag or None
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        d = {'name': name, 'status': '?', 'new': True}
+        if requestee:
+            d['requestee'] = requestee
+        args['ids'] = [attachment_id]
+        args['flags'] = [d]
+        reply = self.__proxy.Bug.update_attachment(args)
+        return None
+
+    @xmlrpc_method
+    def rm_aflags(self, attachment_id, names):
+        """
+        Delete flags from specified attachments
+        Args:
+            attachment_id (int): attachment ID
+            names (list of str): list of flag names or numberic ids of flag instance
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        flags = []
+        for name in names:
+            d = {'status': 'X'}
+
+            if name.isdigit():
+                d['id'] = int(name)
+            else:
+                d['name'] = name
+            flags.append(d)
+        args['ids'] = [attachment_id]
+        args['flags'] = flags
+        reply = self.__proxy.Bug.update_attachment(args)
+        return None
+
+    @xmlrpc_method
+    def update_aflag(self, attachment_id, name, status):
+        """
+        Change attachment flug status
+        Args:
+            attachment_id (int): attachment ID
+            name (str): flag name or numberic id of flag instance
+            statsus: new status, either - or +
+        Returns:
+            None
+        """
+        args = self.__common_args()
+        d = {'status': status}
+        if name.isdigit():
+            d['id'] = int(name)
+        else:
+            d['name'] = name
+        args['ids'] = [attachment_id]
+        args['flags'] = [d]
+        reply = self.__proxy.Bug.update_attachment(args)
         return None
