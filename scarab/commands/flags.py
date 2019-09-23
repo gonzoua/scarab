@@ -16,7 +16,7 @@ class Command(Base):
 
     def register(self, subparsers):
         """Register parser for flags-related commands"""
-        parser_ls = subparsers.add_parser('lsflags')
+        parser_ls = subparsers.add_parser('flags')
         parser_ls.set_defaults(func=self.run_ls)
         parser_ls.add_argument('bug_id', type=int, help='bug ID')
 
@@ -38,7 +38,7 @@ class Command(Base):
         parser_set.add_argument('status', type=str, choices=['+', '-'], help='flag status')
 
     def run_ls(self, args):
-        """Implementation of the 'lsflags' command"""
+        """Implementation of the 'flags' command"""
         bugzilla = bugzilla_instance()
         try:
             bug = bugzilla.bug(args.bug_id)

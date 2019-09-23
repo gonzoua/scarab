@@ -51,6 +51,11 @@ addflag [-h] bug_id name [requestee]
 
 Add new flag named name to bug bug_id. If flag can be requested from specific user they can be specified by an optional requestee argument.
 
+## aflags
+aflags [-h] attachment_id
+
+Display flags for bug bug_id.
+
 ## attach
 attach [-h] [-s SUMMARY] [-c COMMENT | -F COMMENT_FILE] [-t CONTENT_TYPE] attachment pr
 
@@ -76,8 +81,8 @@ info [-h] bug_id
 
 Display information for bug bug_id including bug description
 
-## lsfalgs
-lsflags [-h] bug_id
+## flags
+flags [-h] bug_id
 
 Display flags for bug bug_id.
 

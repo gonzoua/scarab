@@ -16,7 +16,7 @@ class Command(Base):
 
     def register(self, subparsers):
         """Register parser for attachment flags-related commands"""
-        parser_ls = subparsers.add_parser('lsaflags')
+        parser_ls = subparsers.add_parser('aflags')
         parser_ls.set_defaults(func=self.run_ls)
         parser_ls.add_argument('attachment_id', type=int, help='attachment ID')
 
@@ -38,7 +38,7 @@ class Command(Base):
         parser_set.add_argument('status', type=str, choices=['+', '-'], help='flag status')
 
     def run_ls(self, args):
-        """Implementation of the 'lsflags' command"""
+        """Implementation of the 'aflags' command"""
         bugzilla = bugzilla_instance()
         try:
             attachemnt = bugzilla.attachment(args.attachment_id)
@@ -68,7 +68,7 @@ class Command(Base):
                 ui.output(row_format.format(*row))
 
     def run_add(self, args):
-        """Implementation of the 'addflag' command"""
+        """Implementation of the 'addaflag' command"""
         bugzilla = bugzilla_instance()
         try:
             bugzilla.add_aflag(args.attachment_id, args.name, args.requestee)
@@ -76,7 +76,7 @@ class Command(Base):
             ui.fatal('Bugzilla error: {}'.format(ex.message))
 
     def run_rm(self, args):
-        """Implementation of the 'rmflags' command"""
+        """Implementation of the 'rmaflags' command"""
         bugzilla = bugzilla_instance()
         try:
             bugzilla.rm_aflags(args.attachment_id, args.name)
@@ -84,7 +84,7 @@ class Command(Base):
             ui.fatal('Bugzilla error: {}'.format(ex.message))
 
     def run_set(self, args):
-        """Implementation of the 'setflag' command"""
+        """Implementation of the 'setaflag' command"""
         bugzilla = bugzilla_instance()
         try:
             bugzilla.update_aflag(args.attachment_id, args.name, args.status)
