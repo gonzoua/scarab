@@ -38,6 +38,7 @@ setup(
     version = __version__,
     description = 'A FreBSD Bugzilla CLI client.',
     long_description = long_description,
+    long_description_content_type = 'text/markdown',
     url = 'https://github.com/gonzoua/scarab',
     author = 'Oleksandr Tymoshenko',
     author_email = 'gonzo@bluezbox.com',
